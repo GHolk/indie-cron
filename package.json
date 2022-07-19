@@ -1,0 +1,25 @@
+{
+  "name": "indie-corn",
+  "version": "1.0.0",
+  "description": "async corn script to work with indie-web stuff",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "indieweb",
+    "mastodon",
+    "fediverse",
+    "rss",
+    "atom",
+    "backup"
+  ],
+  "author": "gholk",
+  "license": "ISC",
+  "dependencies": {
+    "request-light": "^0.5.8"
+  }
+}

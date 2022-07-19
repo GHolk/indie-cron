@@ -6,17 +6,14 @@ const fs = require('fs')
 const child_process = require('child_process')
 const util = require('util')
 
+const {Fetch} = require('./lib/fetch.js')
+
 class MastodonArchiver {
-    fetch(url, option = {}) {
-        return new Promise(ok => {
-            const request = https.request(url, option, res => {
-                const result = []
-                res.setEncoding('utf8')
-                res.on('data', chunk => result.push(String(chunk)))
-                res.on('end', () => ok({response: res, body: result.join('')}))
-            })
-            request.end()
-        })
+    constructor(...args) {
+        this._constructor(...args)
+    }
+    _constructor() {
+        this.fetch = new Fetch()
     }
     static main() {
         const config = require('./config.json')
@@ -43,18 +40,6 @@ class MastodonArchiver {
         else this.init = false
         await this.backup('favourites', 'favourite')
     }
-    parseLink(text) {
-        text = text.trim()
-        const regexp = /<(.+?)>; *rel="(.*?)"(, *| *$)/y
-        const link = {}
-        while (true) {
-            const scan = regexp.exec(text)
-            if (!scan) break
-            const [, url, rel] = scan
-            link[rel] = url
-        }
-        return link
-    }
     async backup(apiPath, subDir) {
         console.log(`save into ${subDir}`)
         const base = this.config['api-url']
@@ -65,12 +50,12 @@ class MastodonArchiver {
         let url = `${base}/${apiPath}?limit=${limit}`
         do {
             console.log(`fetch ${url}`)
-            const {response, body} = await this.fetch(url, {
+            const response = await this.fetch.fetch(url, {
                 headers: {
                     Authorization: `Bearer ${this.config['access-token']}`
                 }
             })
-            list = list.concat(JSON.parse(body))
+            list = list.concat(JSON.parse(response.responseText))
             const firstStatusCurrent = list[list.length-1]
             if (this.init) {
                 if (firstStatus == firstStatusCurrent.id) break
@@ -78,14 +63,14 @@ class MastodonArchiver {
             }
             else if (this.statusExist(firstStatusCurrent.id, subDir)) break
 
-            const link = this.parseLink(response.headers.link)
+            const link = this.fetch.parseLink(response.headers.link)
             url = link['next']
         }
         while (true)
 
         for (const status of list.slice().reverse()) {
             if (!this.statusExist(status.id, subDir)) {
-                this.statusSave(status, subDir)
+                await this.statusSave(status, subDir)
             }
         }
     }
@@ -103,16 +88,16 @@ class MastodonArchiver {
             return false
         }
     }
-    statusSave(status, dir) {
+    async statusSave(status, dir) {
         fs.writeFileSync(
             `${dir}/${status.id}.json`, JSON.stringify(status), 'utf8'
         )
         const attachment = status['media_attachments']
         if (attachment && attachment.length > 0) {
-            this.attachmentSave(status)
+            await this.attachmentSave(status)
         }
     }
-    attachmentSave(status) {
+    async attachmentSave(status) {
         const attachments = status.media_attachments
         const post = status.id
         try {
@@ -127,9 +112,8 @@ class MastodonArchiver {
             let suffix = ''
             if (scan) suffix = scan[0]
             const file = item.id + suffix
-            const wget = 'wget --no-verbose ' +
-                  `-O attachment/${post}/${file} ${item.url}`
-            const result = child_process.execSync(wget)
+            console.log(`download ${item.url} attachment/${post}/${file}`)
+            await this.fetch.download(item.url, `attachment/${post}/${file}`)
         }
     }
     statusExist(id, dir) {
@@ -142,6 +126,27 @@ class MastodonArchiver {
         return true
     }
 }
+
+// class WebMentionSender {
+//     async post(url, dict) {
+//         const query = this.querystring.encode(dict)
+//         await this.fetch(url, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/x-www-form-urlencoded'
+//             }
+//             body: query
+//         })
+//     }
+//     async send(origin, reply) {
+//         const endPoint = await this.findEndPoint(origin)
+//         if (!endPoint) return
+//         await this.fetch(endPoint, {
+//             source: reply,
+//             target: origin
+//         })
+//     }
+// }
 
 if (require.main == module) MastodonArchiver.main()
 else exports.MastodonArchiver = MastodonArchiver
