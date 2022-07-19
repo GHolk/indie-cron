@@ -1,0 +1,7 @@
+{
+  "api-url": "https://mastodon.social/api/v1",
+  "path": "/backup/mastodon",
+  "limit": 10,
+  "uid": "12345",
+  "access-token": "0123456789abcdefghijklmnopqrstuvwxyzABCDEFG"
+}
