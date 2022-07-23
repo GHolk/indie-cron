@@ -26,7 +26,8 @@ class MastodonArchiver {
         })
     }
     static async main() {
-        const config = require(process.cwd() + '/config.json')
+        const configPath = process.cwd() + '/config.json'
+        const config = require(configPath)
         const object = new this()
         object.setOption(config)
         if (!config.uid) {
@@ -35,7 +36,6 @@ class MastodonArchiver {
             )
             const json = JSON.parse(response.responseText)
             object.config.uid = config.uid = json.id
-            const configPath = __dirname + '/config.json'
             console.log(`set uid ${config.uid} in ${configPath}`)
             fs.writeFileSync(
                 configPath,
