@@ -17,10 +17,32 @@ class MastodonArchiver {
     _constructor() {
         this.fetch = new Fetch()
     }
-    static main() {
-        const config = require('./config.json')
+    async fetchApi(path, option) {
+        return await this.fetch.fetch(`${this.config['api-url']}/${path}`, {
+            headers: {
+                Authorization: `Bearer ${this.config['access-token']}`
+            },
+            ...option
+        })
+    }
+    static async main() {
+        const config = require(process.cwd() + '/config.json')
         const object = new this()
         object.setOption(config)
+        if (!config.uid) {
+            const response = await object.fetchApi(
+                'accounts/verify_credentials'
+            )
+            const json = JSON.parse(response.responseText)
+            object.config.uid = config.uid = json.id
+            const configPath = __dirname + '/config.json'
+            console.log(`set uid ${config.uid} in ${configPath}`)
+            fs.writeFileSync(
+                configPath,
+                JSON.stringify(config, null, 2),
+                'utf8'
+            )
+        }
         object.run()
     }
     setOption(option) {
@@ -32,12 +54,14 @@ class MastodonArchiver {
         if (!this.directoryExistOrCreate('status')) {
             this.init = true
             console.log('initiating')
+            this.directoryExistOrCreate('attachment')
         }
         await this.backup(`accounts/${this.config.uid}/statuses`, 'status')
 
         if (!this.directoryExistOrCreate('favourite')) {
             this.init = true
             console.log('initiating favourite')
+            this.directoryExistOrCreate('attachment')
         }
         else this.init = false
         await this.backup('favourites', 'favourite')
@@ -60,19 +84,24 @@ class MastodonArchiver {
             list = list.concat(JSON.parse(response.responseText))
             const firstStatusCurrent = list[list.length-1]
             if (this.init) {
-                if (firstStatus == firstStatusCurrent.id) break
-                else firstStatus = firstStatusCurrent.id
+                for (const status of list) {
+                    await this.statusSave(status, subDir)
+                }
+                list = []
             }
             else if (this.statusExist(firstStatusCurrent.id, subDir)) break
 
             const link = this.fetch.parseLink(response.headers.link)
             url = link['next']
+            await this.fetch.sleep(this.config.interval)
         }
-        while (true)
+        while (url)
 
         for (const status of list.slice().reverse()) {
             if (!this.statusExist(status.id, subDir)) {
-                if (subDir == 'status') await mastodonWebM.run(status)
+                if (subDir == 'status' && mastodonWebM.run) {
+                    await mastodonWebM.run(status)
+                }
                 await this.statusSave(status, subDir)
             }
         }

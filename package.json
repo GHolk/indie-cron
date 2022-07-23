@@ -1,5 +1,5 @@
 {
-  "name": "indie-corn",
+  "name": "indie-cron",
   "version": "1.0.0",
   "description": "async corn script to work with indie-web stuff",
   "main": "index.js",
