@@ -57,3 +57,5 @@ After toots downloaded, it will try to sends webmentions
 to the links in a toot.
 To disable webmention, `cat /dev/null > hook/mastodon-web-mention.js` .
 
+## license
+GPLv3
