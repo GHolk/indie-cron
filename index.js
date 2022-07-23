@@ -6,6 +6,8 @@ const fs = require('fs')
 const child_process = require('child_process')
 const util = require('util')
 
+const mastodonWebM = require('./hook/mastodon-web-mention.js')
+
 const {Fetch} = require('./lib/fetch.js')
 
 class MastodonArchiver {
@@ -70,6 +72,7 @@ class MastodonArchiver {
 
         for (const status of list.slice().reverse()) {
             if (!this.statusExist(status.id, subDir)) {
+                if (subDir == 'status') await mastodonWebM.run(status)
                 await this.statusSave(status, subDir)
             }
         }
