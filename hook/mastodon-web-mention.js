@@ -64,7 +64,7 @@ class WmCorn {
 const wmCorn = new WmCorn()
 Object.assign(exports, {
     wmCorn, WmCorn,
-    async run(status) {
+    async handler(status) {
         return await this.wmCorn.sendFromToot(status)
     },
     on: 'new-status-post'

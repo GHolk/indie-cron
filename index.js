@@ -6,15 +6,12 @@ const fs = require('fs')
 const child_process = require('child_process')
 const util = require('util')
 
-const mastodonWebM = require('./hook/mastodon-web-mention.js')
-
+const {Femitter} = require('./lib/femitter.js')
 const {Fetch} = require('./lib/fetch.js')
 
-class MastodonArchiver {
-    constructor(...args) {
-        this._constructor(...args)
-    }
+class MastodonArchiver extends Femitter {
     _constructor() {
+        super._constructor()
         this.fetch = new Fetch()
     }
     async fetchApi(path, option) {
@@ -29,6 +26,7 @@ class MastodonArchiver {
         const configPath = process.cwd() + '/config.json'
         const config = require(configPath)
         const object = new this()
+        await object.loadDirectory(__dirname + '/hook', /\.js$/i)
         object.setOption(config)
         if (!config.uid) {
             const response = await object.fetchApi(
@@ -99,8 +97,8 @@ class MastodonArchiver {
 
         for (const status of list.slice().reverse()) {
             if (!this.statusExist(status.id, subDir)) {
-                if (subDir == 'status' && mastodonWebM.run) {
-                    await mastodonWebM.run(status)
+                if (subDir == 'status') {
+                    await this.emit('new-status-post', status)
                 }
                 await this.statusSave(status, subDir)
             }
@@ -158,27 +156,6 @@ class MastodonArchiver {
         return true
     }
 }
-
-// class WebMentionSender {
-//     async post(url, dict) {
-//         const query = this.querystring.encode(dict)
-//         await this.fetch(url, {
-//             method: 'POST',
-//             headers: {
-//                 'Content-Type': 'application/x-www-form-urlencoded'
-//             }
-//             body: query
-//         })
-//     }
-//     async send(origin, reply) {
-//         const endPoint = await this.findEndPoint(origin)
-//         if (!endPoint) return
-//         await this.fetch(endPoint, {
-//             source: reply,
-//             target: origin
-//         })
-//     }
-// }
 
 if (require.main == module) MastodonArchiver.main()
 else exports.MastodonArchiver = MastodonArchiver

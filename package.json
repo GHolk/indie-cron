@@ -1,6 +1,6 @@
 {
   "name": "indie-cron",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "async corn script to work with indie-web stuff",
   "main": "index.js",
   "directories": {
@@ -21,6 +21,7 @@
   "author": "gholk",
   "license": "GPLv3",
   "dependencies": {
+    "emittery": "^0.11.0",
     "request-light": "^0.5.8",
     "send-webmention": "^2.0.0"
   }
