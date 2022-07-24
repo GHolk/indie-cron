@@ -11,7 +11,7 @@ class WmCorn {
     htmlToLinkRel(html) {
         const $ = cheerio.load(html)
         const link = []
-        $('a').each((i, a) => {
+        $('a:not(.mention):not(.hashtag)').each((i, a) => {
             const url = $(a).attr('href')
             link.push(url)
         })

@@ -4,3 +4,4 @@
 * exclude webmention list
 * config in js?
 * use async fs
+* exclude tag
