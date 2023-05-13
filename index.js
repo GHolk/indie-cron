@@ -122,9 +122,11 @@ class MastodonArchiver extends Femitter {
         fs.writeFileSync(
             `${dir}/${status.id}.json`, JSON.stringify(status), 'utf8'
         )
-        const attachment = status['media_attachments']
-        if (attachment && attachment.length > 0) {
-            await this.attachmentSave(status)
+        for (let s = status; s.reblog; s = s.reblog) {
+            const attachment = s['media_attachments']
+            if (attachment && attachment.length > 0) {
+                await this.attachmentSave(s)
+            }
         }
     }
     async attachmentSave(status) {
