@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pack": "tar -czf indie-cron.tgz --exclude '*~' index.js package*json lib hook *.md config.json.template node_modules"
+    "pack": "removeNPMAbsolutePaths . || echo removeNPMAbsolutePaths missing, fullpath in node_modules package.json my leak; tar -czf indie-cron.tgz --exclude '*~' index.js package*json lib hook *.md config.json.template node_modules"
   },
   "keywords": [
     "indieweb",
@@ -24,5 +24,8 @@
     "emittery": "^0.11.0",
     "request-light": "^0.5.8",
     "send-webmention": "^2.0.0"
+  },
+  "devDependencies": {
+    "removeNPMAbsolutePaths": "^3.0.1"
   }
 }

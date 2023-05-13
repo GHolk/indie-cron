@@ -18,7 +18,7 @@ https://github.com/GHolk/indie-cron/releases/latest
 ```sh
 mkdir indie-cron
 cd indie-cron
-wget https://github.com/GHolk/indie-cron/releases/download/v2.2.0/indie-cron.tgz
+wget https://github.com/GHolk/indie-cron/releases/download/vX.X.X/indie-cron.tgz
 tar -xf indie-cron.tgz
 ```
 
