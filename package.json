@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pack": "tar -czf indie-cron.tgz index.js package*json lib hook *.md config.json.template node_modules"
+    "pack": "tar -czf indie-cron.tgz --exclude '*~' index.js package*json lib hook *.md config.json.template node_modules"
   },
   "keywords": [
     "indieweb",

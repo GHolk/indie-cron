@@ -142,8 +142,8 @@ class MastodonArchiver extends Femitter {
             let suffix = ''
             if (scan) suffix = scan[0]
             const file = item.id + suffix
-            console.log(`download ${item.url} attachment/${post}/${file}`)
-            await this.fetch.download(item.url, `attachment/${post}/${file}`)
+            console.log(`download ${url} attachment/${post}/${file}`)
+            await this.fetch.download(url, `attachment/${post}/${file}`)
         }
     }
     statusExist(id, dir) {

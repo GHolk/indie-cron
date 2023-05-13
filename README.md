@@ -3,6 +3,25 @@ Incrementally backup mastodon toot; expected to run in (ana)cron.
 This script also sends webmentions to the links present in toots
 from your self, not include boost.
 
+## install
+use git
+
+```sh
+git clone https://github.com/GHolk/indie-cron
+cd indie-cron
+npm install
+```
+
+Or download tarball indie-cron.tgz from url:
+https://github.com/GHolk/indie-cron/releases/latest
+
+```sh
+mkdir indie-cron
+cd indie-cron
+wget https://github.com/GHolk/indie-cron/releases/download/v2.2.0/indie-cron.tgz
+tar -xf indie-cron.tgz
+```
+
 ## usage
 First, you need to create a mastodon application on your server.
 You need **read** permission.
@@ -11,10 +30,6 @@ Then copy the access token.
 because this application will cost little system resource.)
 
 ```sh
-git clone https://github.com/GHolk/indie-cron
-cd indie-cron
-npm install
-
 cp config.json.template config.json
 vi config.json # config it
 
@@ -26,7 +41,7 @@ like:
 
 ```anacron
 # anacron
-1      2       mastodon-archive  cd /home/user/indie-cron; ./index.js
+1      2       mastodon-archive  cd /home/user/indie-cron && ./index.js
 ```
 
 ## config
